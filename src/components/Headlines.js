@@ -1,24 +1,34 @@
 import React from 'react';
+// We need to import connect from React Redux.
+import { connect } from 'react-redux';
+// We also need to import our ApiCall as well.
+import { makeApiCall } from './actions';
 
 class Headlines extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      error: null,
-      isLoaded: false,
-      headlines: []
-    };
-    componentDidMount() {
-      this.makeApiCall()
-    }
-    
+    // We will remove this.state since we'll be using the Redux store to handle state.
+    // this.state = {
+    //   error: null,
+    //   isLoaded: false,
+    //   headlines: []
+    // };
+  }
+
+  // makeApiCall() has been removed.
+
+  componentDidMount() {
+    // Now we'll use dispatch() to make our API call.
+    const { dispatch } = this.props;
+    dispatch(makeApiCall());
   }
 
   render() {
-    const { error, isLoaded, headlines } = this.state;
+    // We deconstruct the mapped Redux properties from this.props.
+    const { error, isLoading, headlines } = this.props;
     if (error) {
       return <React.Fragment>Error: {error.message}</React.Fragment>;
-    } else if (!isLoaded) {
+    } else if (isLoading) {
       return <React.Fragment>Loading...</React.Fragment>;
     } else {
       return (
@@ -38,4 +48,14 @@ class Headlines extends React.Component {
   }
 }
 
-export default Headlines;
+// We'll also need to add mapStateToProps() as well.
+
+const mapStateToProps = state => {
+  return {
+    headlines: state.headlines,
+    isLoading: state.isLoading,
+    error: state.error
+  }
+}
+
+export default connect(mapStateToProps)(Headlines);
